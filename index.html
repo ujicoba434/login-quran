@@ -21,59 +21,63 @@
     
     <button class="sign-in-btn" onclick="login()">Masuk</button>
 
-    <p>Don't have an account? <a href="">Register here</a></p>
+    <p>Don't have an account? <a href="https://adhaedieswulandari1212.github.io/Quran-Apps/">Register here</a></p>
   </div>
 
+  <!-- Tambahkan Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js"></script>
+
   <script>
+    // Inisialisasi Firebase
+    const firebaseConfig = {
+  apiKey: "AIzaSyBm4iohjK2IjaPvXpE5uSPir2LFXlmpVG4",
+  authDomain: "userdata-quran.firebaseapp.com",
+  projectId: "userdata-quran",
+  storageBucket: "userdata-quran.firebasestorage.app",
+  messagingSenderId: "971982441471",
+  appId: "1:971982441471:web:b2439b51f946eb6ca4f5ca"
+};
+
+    // Inisialisasi aplikasi Firebase
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
     function togglePasswordVisibility() {
       const kataSandi = document.getElementById('password');
       kataSandi.type = kataSandi.type === 'password' ? 'text' : 'password';
     }
 
-    // Fungsi untuk mengirim data ke Google Sheets
-    function sendToGoogleSheets(user) {
-      const url = 'https://script.google.com/macros/s/AKfycbxqMn3MTq9KGYXdXpW9etyAEzzt-jzB8bVowxjiWN5_-VuQNbAJRMkXm_IVEaYgO55C/exec';
-      const data = {
+    // Fungsi untuk mengirim data ke Firestore
+    function sendToFirestore(user) {
+      db.collection("users").add({
         namaLengkap: user.namaLengkap,
         email: user.email,
         username: user.username,
-        kataSandi: user.kataSandi
-      };
-
-      fetch(url, {
-        method: 'POST',
-        body: JSON.stringify(data),
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        mode: 'no-cors'
+        kataSandi: user.kataSandi,
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
       })
-      .then(response => {
-        console.log('Data login berhasil dikirim ke Google Sheets');
+      .then(() => {
+        console.log('Data login berhasil disimpan ke Firestore');
       })
       .catch(error => {
-        console.log('Error mengirim data login:', error);
+        console.log('Error menyimpan data login:', error);
       });
     }
 
     document.querySelector('.sign-in-btn').addEventListener('click', function() {
-      // Ambil nilai input
       const username = document.getElementById('username').value;
       const kataSandi = document.getElementById('password').value;
 
-      // Ambil data pengguna dari localStorage
       const pengguna = JSON.parse(localStorage.getItem('pengguna')) || [];
 
-      // Cek kredensial
       const user = pengguna.find(user => user.username === username && user.kataSandi === kataSandi);
 
       if (user) {
-        // Simpan info pengguna yang login
         localStorage.setItem('penggunaLogin', JSON.stringify(user));
-        // Kirim data login ke Google Sheets
-        sendToGoogleSheets(user);
+        sendToFirestore(user);
         alert('Login berhasil!');
-        window.location.href = ' https://ujicoba434.github.io/Home-page-Quran/';
+        window.location.href = ' https://ujicoba434.github.io/login-quran/';
       } else {
         alert('Username atau kata sandi salah!');
       }
@@ -163,6 +167,5 @@
       text-decoration: none;
     }
   </style>
-<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'934b2a560ad5adc6',t:'MTc0NTM4ODI4Ni4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>
